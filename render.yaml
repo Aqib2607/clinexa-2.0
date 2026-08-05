@@ -1,10 +1,27 @@
 services:
-  # Frontend Web App (React + Vite SPA)
+  - type: web
+    name: clinexa-backend
+    runtime: php
+    rootDir: backend
+    buildCommand: composer install --no-dev --optimize-autoloader && php artisan config:cache && php artisan route:cache
+    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: APP_NAME
+        value: Clinexa
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: DB_CONNECTION
+        value: mysql
+
   - type: web
     name: clinexa-frontend
     runtime: static
     rootDir: frontend
-    buildCommand: "npm install && npm run build"
+    buildCommand: npm install && npm run build
     staticPublishPath: dist
     routes:
       - type: rewrite
