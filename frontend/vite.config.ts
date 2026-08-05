@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    outDir: process.env.VERCEL ? "dist" : "backend/public",
-    emptyOutDir: process.env.VERCEL ? true : false,
+    outDir: "dist",
+    emptyOutDir: true,
   },
 }));
