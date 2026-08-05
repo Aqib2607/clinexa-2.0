@@ -20,6 +20,10 @@ services:
         value: database
       - key: CACHE_STORE
         value: database
+      - key: FRONTEND_URL
+        value: https://clinexa-frontend.onrender.com
+      - key: SANCTUM_STATEFUL_DOMAINS
+        value: clinexa-frontend.onrender.com,localhost,localhost:5173,127.0.0.1,127.0.0.1:5173
 
   # Frontend Web App (React + Vite SPA)
   - type: web
@@ -28,8 +32,12 @@ services:
     rootDir: frontend
     buildCommand: "npm install && npm run build"
     staticPublishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://clinexa-backend.onrender.com
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
+
 

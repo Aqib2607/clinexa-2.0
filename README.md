@@ -67,7 +67,7 @@ Clinexa is a comprehensive, modern, and production-ready **Hospital Management S
 ```bash
 # Clone the repository
 git clone https://github.com/Aqib2607/clinexa.git
-cd clinexa
+cd clinexa/frontend
 
 # Install dependencies
 npm install
