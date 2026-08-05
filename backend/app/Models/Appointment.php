@@ -13,15 +13,16 @@ class Appointment extends Model
         'doctor_id',
         'slot_id',
         'appointment_date',
-        'appointment_time',
-        'duration',
-        'reason',
-        'notes',
         'status',
         'payment_status',
         'symptoms',
         'diagnosis',
     ];
+
+    protected $casts = [
+        'appointment_date' => 'date',
+    ];
+
 
     public function patient(): BelongsTo
     {

@@ -15,6 +15,15 @@ class AppointmentController extends Controller
      */
     public function index(Request $request)
     {
+        // Validate filter inputs
+            $request->validate([
+            'doctor_id'  => 'nullable|integer|exists:doctors,id',
+            'patient_id' => 'nullable|integer|exists:patients,id',
+            'date'       => 'nullable|date',
+            'status'     => 'nullable|in:pending,confirmed,completed,cancelled,no_show',
+            'per_page'   => 'nullable|integer|min:1|max:100',
+        ]);
+
         $query = Appointment::with(['patient', 'doctor.department', 'slot']);
 
         if ($request->has('doctor_id')) {
@@ -33,7 +42,7 @@ class AppointmentController extends Controller
             $query->where('status', $request->status);
         }
 
-        return response()->json($query->paginate(15));
+        return response()->json($query->paginate($request->get('per_page', 15)));
     }
 
     /**

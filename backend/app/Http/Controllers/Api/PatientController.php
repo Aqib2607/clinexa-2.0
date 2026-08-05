@@ -37,7 +37,7 @@ class PatientController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'dob' => 'nullable|date',
-            'gender' => 'nullable|string|in:Male,Female,Other',
+            'gender' => 'nullable|string|in:male,female,other',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'blood_group' => 'nullable|string|max:5',
@@ -73,7 +73,7 @@ class PatientController extends Controller
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'dob' => 'nullable|date',
-            'gender' => 'nullable|string|in:Male,Female,Other',
+            'gender' => 'nullable|string|in:male,female,other',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'blood_group' => 'nullable|string|max:5',

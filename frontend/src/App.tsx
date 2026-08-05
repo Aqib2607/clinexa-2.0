@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,7 +9,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 
-// Public Pages
+// ── Public Pages: eagerly loaded (above the fold, needed immediately) ──
 import HomePage from "@/pages/public/HomePage";
 import { ProtectedHomepage } from "@/components/ProtectedHomepage";
 import AboutPage from "@/pages/public/AboutPage";
@@ -20,58 +21,64 @@ import ContactPage from "@/pages/public/ContactPage";
 import PrivacyPage from "@/pages/public/PrivacyPage";
 import TermsPage from "@/pages/public/TermsPage";
 import ConsentPage from "@/pages/public/ConsentPage";
-
-// Auth
-import LoginPage from "@/pages/auth/LoginPage";
-import PatientLogin from "@/pages/auth/PatientLogin";
-import RegisterPage from "@/pages/auth/RegisterPage";
-
-// Dashboards
-import AdminDashboard from "@/pages/dashboard/AdminDashboard";
-import DoctorDashboard from "@/pages/dashboard/DoctorDashboard";
-import NurseDashboard from "@/pages/dashboard/NurseDashboard";
-import PatientDashboard from "@/pages/dashboard/PatientDashboard";
-
-// Patient Pages
-import PatientAppointments from "@/pages/dashboard/patient/PatientAppointments";
-import PatientRecords from "@/pages/dashboard/patient/PatientRecords";
-import PatientPrescriptions from "@/pages/dashboard/patient/PatientPrescriptions";
-import PatientSettings from "@/pages/dashboard/patient/PatientSettings";
-
-// Doctor Pages
-import DoctorAppointments from "@/pages/dashboard/doctor/DoctorAppointments";
-import DoctorPatients from "@/pages/dashboard/doctor/DoctorPatients";
-import DoctorPrescriptions from "@/pages/dashboard/doctor/DoctorPrescriptions";
-import DoctorSchedule from "@/pages/dashboard/doctor/DoctorSchedule";
-import DoctorSettings from "@/pages/dashboard/doctor/DoctorSettings";
-
-// Nurse Pages
-import NursePatients from "@/pages/dashboard/nurse/NursePatients";
-import NursePatientChart from "@/pages/dashboard/nurse/NursePatientChart";
-import NurseVitals from "@/pages/dashboard/nurse/NurseVitals";
-import NurseTasks from "@/pages/dashboard/nurse/NurseTasks";
-import NurseSettings from "@/pages/dashboard/nurse/NurseSettings";
-
-// Admin Pages
-import { ScrollToTop } from "@/components/ScrollToTop";
-import AppointmentList from "@/pages/dashboard/admin/AppointmentList";
-import BillingPage from "@/pages/dashboard/admin/BillingPage";
-import PharmacyPOS from "@/pages/dashboard/admin/PharmacyPOS";
-import SampleCollection from "@/pages/dashboard/lis/SampleCollection";
-import LabResults from "@/pages/dashboard/lis/LabResults";
-import RadiologyWorklist from "@/pages/dashboard/ris/RadiologyWorklist";
-import AdmissionDashboard from "@/pages/dashboard/ipd/AdmissionDashboard";
-import NursingStation from "@/pages/dashboard/nursing/NursingStation";
-import InventoryDashboard from "@/pages/dashboard/inventory/InventoryDashboard";
-import HrDashboard from "@/pages/dashboard/hr/HrDashboard";
-import AccountsDashboard from "@/pages/dashboard/accounts/AccountsDashboard";
-import DoctorsManagement from "@/pages/dashboard/admin/DoctorsManagement";
-import DepartmentsManagement from "@/pages/dashboard/admin/DepartmentsManagement";
-import StaffManagement from "@/pages/dashboard/admin/StaffManagement";
-import AdminReports from "@/pages/dashboard/admin/AdminReports";
-import AdminSettings from "@/pages/dashboard/admin/AdminSettings";
-
 import NotFound from "@/pages/NotFound";
+
+// ── Auth Pages: lazy loaded ──
+const LoginPage        = lazy(() => import("@/pages/auth/LoginPage"));
+const PatientLogin     = lazy(() => import("@/pages/auth/PatientLogin"));
+const RegisterPage     = lazy(() => import("@/pages/auth/RegisterPage"));
+
+// ── Admin Dashboard Pages: lazy loaded ──
+const AdminDashboard       = lazy(() => import("@/pages/dashboard/AdminDashboard"));
+const DoctorsManagement    = lazy(() => import("@/pages/dashboard/admin/DoctorsManagement"));
+const AppointmentList      = lazy(() => import("@/pages/dashboard/admin/AppointmentList"));
+const DepartmentsManagement = lazy(() => import("@/pages/dashboard/admin/DepartmentsManagement"));
+const StaffManagement      = lazy(() => import("@/pages/dashboard/admin/StaffManagement"));
+const AdminReports         = lazy(() => import("@/pages/dashboard/admin/AdminReports"));
+const AdminSettings        = lazy(() => import("@/pages/dashboard/admin/AdminSettings"));
+const BillingPage          = lazy(() => import("@/pages/dashboard/admin/BillingPage"));
+const PharmacyPOS          = lazy(() => import("@/pages/dashboard/admin/PharmacyPOS"));
+const SampleCollection     = lazy(() => import("@/pages/dashboard/lis/SampleCollection"));
+const LabResults           = lazy(() => import("@/pages/dashboard/lis/LabResults"));
+const RadiologyWorklist    = lazy(() => import("@/pages/dashboard/ris/RadiologyWorklist"));
+const AdmissionDashboard   = lazy(() => import("@/pages/dashboard/ipd/AdmissionDashboard"));
+const NursingStation       = lazy(() => import("@/pages/dashboard/nursing/NursingStation"));
+const InventoryDashboard   = lazy(() => import("@/pages/dashboard/inventory/InventoryDashboard"));
+const HrDashboard          = lazy(() => import("@/pages/dashboard/hr/HrDashboard"));
+const AccountsDashboard    = lazy(() => import("@/pages/dashboard/accounts/AccountsDashboard"));
+
+// ── Doctor Dashboard Pages: lazy loaded ──
+const DoctorDashboard      = lazy(() => import("@/pages/dashboard/DoctorDashboard"));
+const DoctorAppointments   = lazy(() => import("@/pages/dashboard/doctor/DoctorAppointments"));
+const DoctorPatients       = lazy(() => import("@/pages/dashboard/doctor/DoctorPatients"));
+const DoctorPrescriptions  = lazy(() => import("@/pages/dashboard/doctor/DoctorPrescriptions"));
+const DoctorSchedule       = lazy(() => import("@/pages/dashboard/doctor/DoctorSchedule"));
+const DoctorSettings       = lazy(() => import("@/pages/dashboard/doctor/DoctorSettings"));
+
+// ── Nurse Dashboard Pages: lazy loaded ──
+const NurseDashboard       = lazy(() => import("@/pages/dashboard/NurseDashboard"));
+const NursePatients        = lazy(() => import("@/pages/dashboard/nurse/NursePatients"));
+const NursePatientChart    = lazy(() => import("@/pages/dashboard/nurse/NursePatientChart"));
+const NurseVitals          = lazy(() => import("@/pages/dashboard/nurse/NurseVitals"));
+const NurseTasks           = lazy(() => import("@/pages/dashboard/nurse/NurseTasks"));
+const NurseSettings        = lazy(() => import("@/pages/dashboard/nurse/NurseSettings"));
+
+// ── Patient Dashboard Pages: lazy loaded ──
+const PatientDashboard     = lazy(() => import("@/pages/dashboard/PatientDashboard"));
+const PatientAppointments  = lazy(() => import("@/pages/dashboard/patient/PatientAppointments"));
+const PatientRecords       = lazy(() => import("@/pages/dashboard/patient/PatientRecords"));
+const PatientPrescriptions = lazy(() => import("@/pages/dashboard/patient/PatientPrescriptions"));
+const PatientSettings      = lazy(() => import("@/pages/dashboard/patient/PatientSettings"));
+
+// Shared: always needed
+import { ScrollToTop } from "@/components/ScrollToTop";
+
+// Loading fallback shown while lazy chunks are being fetched
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
+  </div>
+);
 
 const queryClient = new QueryClient();
 
@@ -81,7 +88,8 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
           {/* Public Routes */}
           <Route element={<PublicLayout />}>
             <Route path="/" element={<ProtectedHomepage />} />
@@ -157,8 +165,9 @@ const App = () => (
 
           {/* 404 */}
           <Route path="*" element={<NotFound />} />
-        </Routes>
-        <ScrollToTop />
+          </Routes>
+          <ScrollToTop />
+        </Suspense>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

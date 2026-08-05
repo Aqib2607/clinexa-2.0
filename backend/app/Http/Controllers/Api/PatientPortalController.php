@@ -44,10 +44,15 @@ class PatientPortalController extends Controller
             'status' => 'sent',
         ]);
 
-        return response()->json([
-            'message' => 'OTP sent successfully to your mobile number.',
-            'dev_hint' => $otpCode,
-        ]);
+        $response = ['message' => 'OTP sent successfully to your mobile number.'];
+
+        // Only expose the OTP code outside of production (for local/staging testing).
+        // NEVER expose this in production.
+        if (config('app.env') !== 'production') {
+            $response['dev_hint'] = $otpCode;
+        }
+
+        return response()->json($response);
     }
 
     public function verifyOtp(Request $request)
@@ -72,6 +77,13 @@ class PatientPortalController extends Controller
         $otpRecord->save();
 
         $patient = Patient::where('phone', $request->mobile_number)->first();
+
+        // Guard: patient record must exist by the time OTP is verified.
+        // (The requestOtp step already verified this, but be defensive.)
+        if (!$patient) {
+            return response()->json(['message' => 'Patient record not found for this mobile number.'], 404);
+        }
+
         $user = \App\Models\User::where('email', $patient->email ?? '')
             ->orWhere('phone', $request->mobile_number)
             ->first();

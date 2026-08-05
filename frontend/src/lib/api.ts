@@ -10,7 +10,11 @@ const api = axios.create({
         'Content-Type': 'application/json',
         'Accept': 'application/json',
     },
-    withCredentials: true, // Important for Sanctum cookie-based auth if used
+    // withCredentials is NOT needed for token-based Sanctum auth.
+    // The Authorization: Bearer <token> header handles authentication.
+    // Enabling withCredentials with cross-origin requests requires
+    // Access-Control-Allow-Origin to be an exact origin (not *),
+    // which is already configured in cors.php.
 });
 
 // Request interceptor to add token if we decide to use Bearer tokens later

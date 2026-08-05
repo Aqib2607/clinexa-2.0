@@ -36,6 +36,7 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => true,
+    // Token-based (Bearer) auth is used; cookies are not needed cross-origin.
+    'supports_credentials' => false,
 
 ];

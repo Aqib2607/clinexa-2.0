@@ -24,9 +24,10 @@ class DepartmentController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'code' => 'required|string|max:50|unique:departments',
-            'description' => 'nullable|string',
+            'name'        => 'required|string|max:255',
+            'code'        => 'required|string|max:50|unique:departments',
+            'description' => 'nullable|string|max:2000',
+            'is_active'   => 'boolean',
         ]);
 
         $department = Department::create($validated);

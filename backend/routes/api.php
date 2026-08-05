@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Route;
 // PUBLIC ROUTES (No authentication required)
 // ============================================================
 
-// Authentication
-Route::prefix('auth')->group(function () {
+// Authentication — rate limited to prevent brute force
+Route::prefix('auth')->middleware('throttle:10,1')->group(function () {
     Route::post('register', [\App\Http\Controllers\Api\AuthController::class, 'register']);
     Route::post('login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
     Route::post('logout', [\App\Http\Controllers\Api\AuthController::class, 'logout'])->middleware('auth:sanctum');
@@ -27,9 +27,9 @@ Route::get('slots/{slot}', [\App\Http\Controllers\Api\AppointmentSlotController:
 // Public appointment booking (guest or patient)
 Route::post('appointments', [\App\Http\Controllers\Api\AppointmentController::class, 'store']);
 
-// Patient Authentication via OTP
-Route::post('patient/otp/request', [\App\Http\Controllers\Api\PatientPortalController::class, 'requestOtp']);
-Route::post('patient/otp/verify', [\App\Http\Controllers\Api\PatientPortalController::class, 'verifyOtp']);
+// Patient Authentication via OTP — rate limited to prevent enumeration and abuse
+Route::post('patient/otp/request', [\App\Http\Controllers\Api\PatientPortalController::class, 'requestOtp'])->middleware('throttle:5,1');
+Route::post('patient/otp/verify', [\App\Http\Controllers\Api\PatientPortalController::class, 'verifyOtp'])->middleware('throttle:10,1');
 
 // Settings (read-only for frontend configuration)
 Route::get('settings', [\App\Http\Controllers\Api\SettingsController::class, 'index']);

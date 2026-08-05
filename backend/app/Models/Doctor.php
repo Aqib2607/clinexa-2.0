@@ -20,6 +20,7 @@ class Doctor extends Model
         'experience_years',
         'is_active',
         'bio',
+        'photo_url',
     ];
 
     protected $casts = [

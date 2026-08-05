@@ -5,6 +5,7 @@ services:
     runtime: docker
     rootDir: backend
     dockerfilePath: Dockerfile
+    healthCheckPath: /up
     envVars:
       - key: APP_NAME
         value: Clinexa
