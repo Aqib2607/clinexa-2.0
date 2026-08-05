@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\AppointmentSlot;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class AppointmentController extends Controller
@@ -61,38 +62,40 @@ class AppointmentController extends Controller
             'symptoms' => 'nullable|string',
         ]);
 
-        // Handle Guest/New Patient
-        if (empty($validated['patient_id'])) {
-            $patient = \App\Models\Patient::firstOrCreate(
-                ['phone' => $validated['phone']],
-                [
-                    'name' => $validated['name'],
-                    'email' => $validated['email'] ?? null,
-                    'uhid' => 'P-' . strtoupper(Str::random(8)), // Simple auto-generate
-                    // Minimal required fields default
-                    'dob' => now()->subYears(18)->format('Y-m-d'), // Placeholder/Default
-                    'gender' => 'Other', // Placeholder
-                    'address' => 'Provided via Online Booking'
-                ]
-            );
-            $validated['patient_id'] = $patient->id;
-        }
-
-        // If slot is provided, check if available
-        if (!empty($validated['slot_id'])) {
-            $slot = AppointmentSlot::findOrFail($validated['slot_id']);
-            if ($slot->status !== 'available') {
-                return response()->json(['message' => 'Slot is not available'], 400);
+        return DB::transaction(function () use ($validated) {
+            // Handle Guest/New Patient
+            if (empty($validated['patient_id'])) {
+                $patient = \App\Models\Patient::firstOrCreate(
+                    ['phone' => $validated['phone']],
+                    [
+                        'name' => $validated['name'],
+                        'email' => $validated['email'] ?? null,
+                        'uhid' => 'P-' . strtoupper(Str::random(8)), // Simple auto-generate
+                        // Minimal required fields default
+                        'dob' => now()->subYears(18)->format('Y-m-d'), // Placeholder/Default
+                        'gender' => 'Other', // Placeholder
+                        'address' => 'Provided via Online Booking'
+                    ]
+                );
+                $validated['patient_id'] = $patient->id;
             }
-            // Mark slot as booked
-            $slot->update(['status' => 'booked']);
-        }
 
-        $validated['appointment_number'] = 'APT-' . strtoupper(Str::random(8));
-        $validated['status'] = 'pending';
+            // If slot is provided, check if available
+            if (!empty($validated['slot_id'])) {
+                $slot = AppointmentSlot::lockForUpdate()->findOrFail($validated['slot_id']);
+                if ($slot->status !== 'available') {
+                    return response()->json(['message' => 'Slot is not available'], 400);
+                }
+                // Mark slot as booked
+                $slot->update(['status' => 'booked']);
+            }
 
-        $appointment = Appointment::create($validated);
-        return response()->json($appointment, 201);
+            $validated['appointment_number'] = 'APT-' . strtoupper(Str::random(8));
+            $validated['status'] = 'pending';
+
+            $appointment = Appointment::create($validated);
+            return response()->json($appointment, 201);
+        });
     }
 
     /**
