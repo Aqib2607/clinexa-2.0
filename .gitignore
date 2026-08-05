@@ -1,7 +1,10 @@
-# Environment files
+# Environment files — .env (local secrets) is ignored, but .env.production
+# (public Vite URLs only, no secrets) is safe to commit.
 .env
-.env.*
+.env.local
+.env.*.local
 !.env.example
+!.env.production
 
 # Dependencies
 node_modules/

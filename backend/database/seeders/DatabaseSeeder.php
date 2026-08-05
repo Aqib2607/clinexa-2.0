@@ -19,18 +19,20 @@ class DatabaseSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'test@example.com'],
             [
-                'name' => 'Test User',
+                'name'     => 'Test User',
+                'phone'    => '0000000000',
                 'password' => Hash::make('password123'),
-                'role' => 'doctor',
+                'role'     => 'doctor',
             ]
         );
 
         User::firstOrCreate(
             ['email' => 'admin01@gmail.com'],
             [
-                'name' => 'Super Admin',
+                'name'     => 'Super Admin',
+                'phone'    => '0000000001',
                 'password' => Hash::make('password123'),
-                'role' => 'super_admin',
+                'role'     => 'super_admin',
             ]
         );
 

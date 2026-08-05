@@ -12,6 +12,20 @@ class Department extends Model
         'code',
         'description',
         'is_active',
+        'overview',
+        'services',
+        'facilities',
+        'image_url',
+        'conditions_treated',
+        'technologies',
+        'why_choose_us',
+    ];
+    protected $casts = [
+        'services'           => 'array',
+        'facilities'         => 'array',
+        'conditions_treated' => 'array',
+        'technologies'       => 'array',
+        'is_active'          => 'boolean',
     ];
 
     public function doctors(): HasMany
@@ -19,3 +33,4 @@ class Department extends Model
         return $this->hasMany(Doctor::class);
     }
 }
+
