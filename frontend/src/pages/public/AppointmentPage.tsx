@@ -25,10 +25,18 @@ const timeSlots = [
 
 import { Department, Doctor } from "@/types";
 
+import { useAuthStore } from "@/hooks/useAuth";
+import { useUser } from "@/hooks/useUser";
+
 export default function AppointmentPage() {
   const [searchParams] = useSearchParams();
   const preselectedDoctorId = searchParams.get('doctor');
-  
+
+  const { user: authUser, isAuthenticated } = useAuthStore();
+  const { data: user } = useUser();
+  const activeUser = user || authUser;
+  const [patientId, setPatientId] = useState<number | null>(null);
+
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     department_id: "" as string | number,
@@ -48,6 +56,46 @@ export default function AppointmentPage() {
   // Data State
   const [departments, setDepartments] = useState<Department[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
+
+  // Auto-fill logged-in patient/user details
+  useEffect(() => {
+    if (activeUser) {
+      setFormData(prev => ({
+        ...prev,
+        name: prev.name || activeUser.name || '',
+        email: prev.email || activeUser.email || '',
+        phone: prev.phone || activeUser.phone || '',
+      }));
+    }
+
+    if (isAuthenticated) {
+      api.get('/patient/profile')
+        .then(res => {
+          const patientData = res.data.patient;
+          const userData = res.data.user;
+          if (patientData) {
+            setPatientId(patientData.id || null);
+            setFormData(prev => ({
+              ...prev,
+              name: patientData.name || userData?.name || prev.name,
+              email: patientData.email || userData?.email || prev.email,
+              phone: patientData.phone || userData?.phone || prev.phone,
+            }));
+          }
+        })
+        .catch(() => {
+          // If non-patient user or endpoint fails, use activeUser
+          if (activeUser) {
+            setFormData(prev => ({
+              ...prev,
+              name: prev.name || activeUser.name || '',
+              email: prev.email || activeUser.email || '',
+              phone: prev.phone || activeUser.phone || '',
+            }));
+          }
+        });
+    }
+  }, [activeUser, isAuthenticated]);
 
   // Fetch Departments on Load
   useEffect(() => {
@@ -78,8 +126,6 @@ export default function AppointmentPage() {
   // Fetch Doctors when Department Changes
   useEffect(() => {
     if (formData.department_id) {
-      // Fetch doctors for this department
-      // Using per_page=100 to get a reasonable list without pagination UI for now
       api.get(`/doctors?department_id=${formData.department_id}&per_page=100`)
         .then(res => setDoctors(res.data.data))
         .catch(err => console.error("Failed to load doctors", err));
@@ -101,12 +147,10 @@ export default function AppointmentPage() {
     setLoading(true);
 
     try {
-      // Combine Date & Time
-      // Assuming backend accepts 'appointment_date' as YYYY-MM-DD HH:mm:ss
       const appointmentDateTime = `${formData.date} ${formData.time}:00`;
 
       const payload = {
-        patient_id: null, // Guest
+        patient_id: patientId || null,
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
@@ -340,9 +384,17 @@ export default function AppointmentPage() {
             {/* Step 4: Details */}
             {currentStep === 4 && (
               <div className="space-y-6">
-                <div>
-                  <h2 className="text-xl font-semibold text-card-foreground mb-2">Your Details</h2>
-                  <p className="text-muted-foreground text-sm">Please provide your contact information</p>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <h2 className="text-xl font-semibold text-card-foreground mb-1">Your Details</h2>
+                    <p className="text-muted-foreground text-sm">Please provide your contact information</p>
+                  </div>
+                  {activeUser && (
+                    <span className="text-xs bg-primary/10 text-primary px-3 py-1.5 rounded-full font-medium flex items-center gap-1.5 self-start sm:self-auto">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      Auto-filled for {activeUser.name}
+                    </span>
+                  )}
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
