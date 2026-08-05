@@ -68,9 +68,19 @@ class Admission extends Model
         return $this->hasMany(VitalSign::class);
     }
 
+    public function vitals(): HasMany
+    {
+        return $this->vitalSigns();
+    }
+
     public function nursingNotes(): HasMany
     {
         return $this->hasMany(NursingNote::class);
+    }
+
+    public function notes(): HasMany
+    {
+        return $this->nursingNotes();
     }
 
     public function otBookings(): HasMany

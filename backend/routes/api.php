@@ -27,6 +27,10 @@ Route::get('slots/{slot}', [\App\Http\Controllers\Api\AppointmentSlotController:
 // Public appointment booking (guest or patient)
 Route::post('appointments', [\App\Http\Controllers\Api\AppointmentController::class, 'store']);
 
+// Patient Authentication via OTP
+Route::post('patient/otp/request', [\App\Http\Controllers\Api\PatientPortalController::class, 'requestOtp']);
+Route::post('patient/otp/verify', [\App\Http\Controllers\Api\PatientPortalController::class, 'verifyOtp']);
+
 // Settings (read-only for frontend configuration)
 Route::get('settings', [\App\Http\Controllers\Api\SettingsController::class, 'index']);
 

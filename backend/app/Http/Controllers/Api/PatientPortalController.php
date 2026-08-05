@@ -13,6 +13,87 @@ use Carbon\Carbon;
 
 class PatientPortalController extends Controller
 {
+    public function requestOtp(Request $request)
+    {
+        $request->validate([
+            'mobile_number' => 'required|string',
+        ]);
+
+        $mobile = $request->mobile_number;
+
+        $patient = Patient::where('phone', $mobile)->first();
+        if (!$patient) {
+            $user = \App\Models\User::where('phone', $mobile)->first();
+            if (!$user) {
+                return response()->json(['message' => 'No patient account found with this mobile number.'], 404);
+            }
+        }
+
+        $otpCode = (string)rand(100000, 999999);
+
+        PatientOtp::create([
+            'mobile_number' => $mobile,
+            'otp_code' => $otpCode,
+            'expires_at' => now()->addMinutes(10),
+            'is_used' => false,
+        ]);
+
+        \App\Models\SmsLog::create([
+            'mobile_number' => $mobile,
+            'message_body' => "Your Clinexa OTP code is {$otpCode}.",
+            'status' => 'sent',
+        ]);
+
+        return response()->json([
+            'message' => 'OTP sent successfully to your mobile number.',
+            'dev_hint' => $otpCode,
+        ]);
+    }
+
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'mobile_number' => 'required|string',
+            'otp' => 'required|string',
+        ]);
+
+        $otpRecord = PatientOtp::where('mobile_number', $request->mobile_number)
+            ->where('otp_code', $request->otp)
+            ->where('is_used', false)
+            ->where('expires_at', '>', now())
+            ->latest()
+            ->first();
+
+        if (!$otpRecord) {
+            return response()->json(['message' => 'Invalid or expired OTP code.'], 422);
+        }
+
+        $otpRecord->is_used = true;
+        $otpRecord->save();
+
+        $patient = Patient::where('phone', $request->mobile_number)->first();
+        $user = \App\Models\User::where('email', $patient->email ?? '')
+            ->orWhere('phone', $request->mobile_number)
+            ->first();
+
+        if (!$user) {
+            $user = \App\Models\User::create([
+                'name' => $patient->name ?? 'Patient User',
+                'email' => $patient->email ?? ('patient_' . time() . '@clinexa.com'),
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'role' => 'patient',
+                'phone' => $request->mobile_number,
+            ]);
+        }
+
+        $token = $user->createToken('patient-token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Login successful',
+            'token' => $token,
+            'user' => $user,
+        ]);
+    }
 
     public function getReports(Request $request)
     {
