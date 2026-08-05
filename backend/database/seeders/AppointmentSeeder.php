@@ -10,93 +10,51 @@ use App\Models\AppointmentSlot;
 
 class AppointmentSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Get required data
-        $patients = Patient::limit(5)->get();
+        $patients = Patient::take(15)->get();
         $doctor = Doctor::first();
-        $slots = AppointmentSlot::limit(5)->get();
+        $slots = AppointmentSlot::take(15)->get();
 
-        if ($patients->count() < 5) {
-            $this->command->error('Not enough patients! Please run PatientSeeder first.');
+        if ($patients->isEmpty() || !$doctor) {
             return;
         }
 
-        if (!$doctor) {
-            $this->command->error('No doctors found! Please seed doctors first.');
-            return;
-        }
-
-        if ($slots->count() < 5) {
-            $this->command->error('Not enough slots! Please run AppointmentSlotSeeder first.');
-            return;
-        }
-
-        $appointments = [
-            [
-                'appointment_number' => 'APT-001',
-                'patient_id' => $patients[0]->id,
-                'doctor_id' => $doctor->id,
-                'slot_id' => $slots[0]->id ?? null,
-                'appointment_date' => now()->addDays(1)->format('Y-m-d'),
-                'status' => 'confirmed',
-                'payment_status' => 'paid',
-                'symptoms' => 'Persistent headache and dizziness',
-                'diagnosis' => null,
-            ],
-            [
-                'appointment_number' => 'APT-002',
-                'patient_id' => $patients[1]->id,
-                'doctor_id' => $doctor->id,
-                'slot_id' => $slots[1]->id ?? null,
-                'appointment_date' => now()->addDays(1)->format('Y-m-d'),
-                'status' => 'confirmed',
-                'payment_status' => 'pending',
-                'symptoms' => 'Chest pain and shortness of breath',
-                'diagnosis' => null,
-            ],
-            [
-                'appointment_number' => 'APT-003',
-                'patient_id' => $patients[2]->id,
-                'doctor_id' => $doctor->id,
-                'slot_id' => $slots[2]->id ?? null,
-                'appointment_date' => now()->subDays(2)->format('Y-m-d'),
-                'status' => 'completed',
-                'payment_status' => 'paid',
-                'symptoms' => 'High blood pressure symptoms',
-                'diagnosis' => 'Hypertension',
-            ],
-            [
-                'appointment_number' => 'APT-004',
-                'patient_id' => $patients[3]->id,
-                'doctor_id' => $doctor->id,
-                'slot_id' => $slots[3]->id ?? null,
-                'appointment_date' => now()->addDays(3)->format('Y-m-d'),
-                'status' => 'confirmed',
-                'payment_status' => 'paid',
-                'symptoms' => 'Regular checkup',
-                'diagnosis' => null,
-            ],
-            [
-                'appointment_number' => 'APT-005',
-                'patient_id' => $patients[4]->id,
-                'doctor_id' => $doctor->id,
-                'slot_id' => $slots[4]->id ?? null,
-                'appointment_date' => now()->subDays(5)->format('Y-m-d'),
-                'status' => 'cancelled',
-                'payment_status' => 'refunded',
-                'symptoms' => 'Cancelled by patient',
-                'diagnosis' => null,
-            ],
+        $symptomsList = [
+            'Persistent headache and dizziness',
+            'Chest pain and shortness of breath',
+            'High blood pressure symptoms',
+            'Regular checkup & consultation',
+            'Severe joint pain and swelling',
+            'Abdominal discomfort & nausea',
+            'Fever and persistent cough',
+            'Skin rash & allergic reaction',
+            'Ear pain and hearing difficulty',
+            'Blurry vision & eye irritation',
+            'Lower back pain after heavy lifting',
+            'Chronic fatigue and weakness',
+            'Diabetes routine follow-up',
+            'Thyroid medication adjustment',
+            'Post-op routine evaluation',
         ];
 
-        foreach ($appointments as $appointmentData) {
-            Appointment::create($appointmentData);
+        $statuses = ['confirmed', 'confirmed', 'completed', 'completed', 'pending', 'cancelled'];
+        $paymentStatuses = ['paid', 'paid', 'pending', 'refunded'];
+
+        for ($i = 0; $i < count($patients); $i++) {
+            Appointment::create([
+                'appointment_number' => 'APT-2026-' . sprintf('%03d', $i + 1),
+                'patient_id' => $patients[$i]->id,
+                'doctor_id' => $doctor->id,
+                'slot_id' => isset($slots[$i]) ? $slots[$i]->id : null,
+                'appointment_date' => now()->addDays(($i % 5) - 2)->format('Y-m-d'),
+                'status' => $statuses[$i % count($statuses)],
+                'payment_status' => $paymentStatuses[$i % count($paymentStatuses)],
+                'symptoms' => $symptomsList[$i % count($symptomsList)],
+                'diagnosis' => $i % 2 === 0 ? 'Evaluated & prescribed treatment' : null,
+            ]);
         }
 
-        $this->command->info('5 appointments seeded successfully!');
+        $this->command->info(count($patients) . ' appointments seeded successfully!');
     }
 }

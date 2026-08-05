@@ -10,76 +10,34 @@ use App\Models\Appointment;
 
 class VisitSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
         Visit::truncate();
         \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
 
-        $patients = Patient::limit(5)->get();
+        $patients = Patient::take(15)->get();
         $doctor = Doctor::first();
-        $appointments = Appointment::where('status', 'completed')->limit(5)->get();
+        $appointments = Appointment::all();
 
-        if ($patients->count() < 5) {
-            $this->command->error('Not enough patients! Please run PatientSeeder first.');
+        if ($patients->isEmpty() || !$doctor) {
             return;
         }
 
-        if (!$doctor) {
-            $this->command->error('No doctors found! Please seed doctors first.');
-            return;
+        $types = ['NEW', 'FOLLOW_UP', 'EMERGENCY', 'NEW', 'FOLLOW_UP'];
+        $statuses = ['completed', 'completed', 'completed', 'active'];
+
+        for ($i = 0; $i < count($patients); $i++) {
+            Visit::create([
+                'patient_id' => $patients[$i]->id,
+                'doctor_id' => $doctor->id,
+                'appointment_id' => isset($appointments[$i]) ? $appointments[$i]->id : null,
+                'visit_date' => now()->subDays($i)->format('Y-m-d'),
+                'type' => $types[$i % count($types)],
+                'status' => $statuses[$i % count($statuses)],
+            ]);
         }
 
-        $visits = [
-            [
-                'patient_id' => $patients[0]->id,
-                'doctor_id' => $doctor->id,
-                'appointment_id' => $appointments[0]->id ?? null,
-                'visit_date' => now()->subDays(2)->format('Y-m-d'),
-                'type' => 'NEW',
-                'status' => 'completed',
-            ],
-            [
-                'patient_id' => $patients[1]->id,
-                'doctor_id' => $doctor->id,
-                'appointment_id' => null,
-                'visit_date' => now()->subDays(5)->format('Y-m-d'),
-                'type' => 'NEW',
-                'status' => 'completed',
-            ],
-            [
-                'patient_id' => $patients[2]->id,
-                'doctor_id' => $doctor->id,
-                'appointment_id' => null,
-                'visit_date' => now()->subDays(10)->format('Y-m-d'),
-                'type' => 'EMERGENCY',
-                'status' => 'completed',
-            ],
-            [
-                'patient_id' => $patients[3]->id,
-                'doctor_id' => $doctor->id,
-                'appointment_id' => null,
-                'visit_date' => now()->format('Y-m-d'),
-                'type' => 'NEW',
-                'status' => 'active',
-            ],
-            [
-                'patient_id' => $patients[4]->id,
-                'doctor_id' => $doctor->id,
-                'appointment_id' => null,
-                'visit_date' => now()->subDays(15)->format('Y-m-d'),
-                'type' => 'FOLLOW_UP',
-                'status' => 'completed',
-            ],
-        ];
-
-        foreach ($visits as $visitData) {
-            Visit::create($visitData);
-        }
-
-        $this->command->info('5 visits seeded successfully!');
+        $this->command->info(count($patients) . ' visits seeded successfully!');
     }
 }

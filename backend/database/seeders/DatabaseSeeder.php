@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,22 +16,51 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Test User',
+                'password' => Hash::make('password123'),
+                'role' => 'doctor',
+            ]
+        );
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
-
-        User::factory()->create([
-            'name' => 'Super Admin',
-            'email' => 'admin01@gmail.com',
-            'role' => 'super_admin',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'admin01@gmail.com'],
+            [
+                'name' => 'Super Admin',
+                'password' => Hash::make('password123'),
+                'role' => 'super_admin',
+            ]
+        );
 
         $this->call([
+            HospitalSeeder::class,
             DepartmentSeeder::class,
             DoctorSeeder::class,
+            DoctorScheduleSeeder::class,
+            PatientSeeder::class,
+            EmployeeSeeder::class,
+            AppointmentSlotSeeder::class,
+            AppointmentSeeder::class,
+            VisitSeeder::class,
+            ServiceSeeder::class,
+            PrescriptionSeeder::class,
+            BillSeeder::class,
+            PaymentSeeder::class,
+            PharmacyItemSeeder::class,
+            TestSeeder::class,
+            LabResultSeeder::class,
+            WardSeeder::class,
+            NursePortalSeeder::class,
+            NurseTaskSeeder::class,
+            PatientNoteSeeder::class,
+            VitalSignSeeder::class,
+            InventorySeeder::class,
+            HrSeeder::class,
+            AccountsSeeder::class,
+            CafeteriaSeeder::class,
+            Phase6AutomationSeeder::class,
             SmsTemplateSeeder::class,
             SystemUpdateSeeder::class,
             SettingsSeeder::class,

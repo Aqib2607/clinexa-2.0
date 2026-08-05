@@ -12,9 +12,6 @@ use Illuminate\Support\Facades\Schema;
 
 class BillSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         Schema::disableForeignKeyConstraints();
@@ -22,108 +19,41 @@ class BillSeeder extends Seeder
         BillItem::truncate();
         Schema::enableForeignKeyConstraints();
 
-        $visits = Visit::limit(5)->get();
-        $services = Service::limit(3)->get();
+        $visits = Visit::take(15)->get();
+        $services = Service::all();
+        $patients = Patient::take(15)->get();
 
-        if ($visits->count() < 5) {
-            $this->command->error('Not enough visits! Please run VisitSeeder first.');
+        if ($visits->isEmpty() || $services->isEmpty() || $patients->isEmpty()) {
             return;
         }
 
-        if ($services->count() < 3) {
-            $this->command->error('Not enough services! Please run ServiceSeeder first.');
-            return;
+        for ($i = 0; $i < count($visits); $i++) {
+            $serv = $services[$i % $services->count()];
+            $total = $serv->prices()->first()?->price ?? 500.00;
+            $status = $i % 3 === 0 ? 'paid' : ($i % 3 === 1 ? 'partial' : 'pending');
+
+            $bill = Bill::create([
+                'bill_number' => 'BILL-2026-' . sprintf('%03d', $i + 1),
+                'visit_id' => $visits[$i]->id,
+                'patient_id' => $patients[$i % count($patients)]->id,
+                'total_amount' => $total,
+                'discount_amount' => 0.00,
+                'paid_amount' => $status === 'paid' ? $total : ($status === 'partial' ? $total / 2 : 0.00),
+                'due_amount' => $status === 'paid' ? 0.00 : ($status === 'partial' ? $total / 2 : $total),
+                'status' => 'finalized',
+                'payment_status' => $status,
+            ]);
+
+            BillItem::create([
+                'bill_id' => $bill->id,
+                'service_id' => $serv->id,
+                'item_name' => $serv->name,
+                'quantity' => 1,
+                'unit_price' => $total,
+                'total_price' => $total,
+            ]);
         }
 
-        $bills = [
-            [
-                'bill_number' => 'BILL-001',
-                'visit_id' => $visits[0]->id,
-                'patient_id' => $visits[0]->patient_id,
-                'total_amount' => 1300.00,
-                'discount_amount' => 0.00,
-                'paid_amount' => 1300.00,
-                'due_amount' => 0.00,
-                'status' => 'finalized',
-                'payment_status' => 'paid',
-                'items' => [
-                    ['service_id' => $services[0]->id, 'item_name' => $services[0]->name, 'quantity' => 1, 'unit_price' => 500.00, 'total_price' => 500.00],
-                    ['service_id' => $services[1]->id, 'item_name' => $services[1]->name, 'quantity' => 1, 'unit_price' => 800.00, 'total_price' => 800.00],
-                ],
-            ],
-            [
-                'bill_number' => 'BILL-002',
-                'visit_id' => $visits[1]->id,
-                'patient_id' => $visits[1]->patient_id,
-                'total_amount' => 1100.00,
-                'discount_amount' => 100.00,
-                'paid_amount' => 500.00,
-                'due_amount' => 500.00,
-                'status' => 'finalized',
-                'payment_status' => 'partial',
-                'items' => [
-                    ['service_id' => $services[0]->id, 'item_name' => $services[0]->name, 'quantity' => 1, 'unit_price' => 500.00, 'total_price' => 500.00],
-                    ['service_id' => $services[2]->id, 'item_name' => $services[2]->name, 'quantity' => 2, 'unit_price' => 300.00, 'total_price' => 600.00],
-                ],
-            ],
-            [
-                'bill_number' => 'BILL-003',
-                'visit_id' => $visits[2]->id,
-                'patient_id' => $visits[2]->patient_id,
-                'total_amount' => 1700.00,
-                'discount_amount' => 0.00,
-                'paid_amount' => 0.00,
-                'due_amount' => 1700.00,
-                'status' => 'finalized',
-                'payment_status' => 'pending',
-                'items' => [
-                    ['service_id' => $services[0]->id, 'item_name' => $services[0]->name, 'quantity' => 1, 'unit_price' => 500.00, 'total_price' => 500.00],
-                    ['service_id' => $services[1]->id, 'item_name' => $services[1]->name, 'quantity' => 1, 'unit_price' => 800.00, 'total_price' => 800.00],
-                    ['service_id' => $services[2]->id, 'item_name' => $services[2]->name, 'quantity' => 1, 'unit_price' => 300.00, 'total_price' => 300.00],
-                ],
-            ],
-            [
-                'bill_number' => 'BILL-004',
-                'visit_id' => $visits[3]->id,
-                'patient_id' => $visits[3]->patient_id,
-                'total_amount' => 500.00,
-                'discount_amount' => 50.00,
-                'paid_amount' => 450.00,
-                'due_amount' => 0.00,
-                'status' => 'finalized',
-                'payment_status' => 'paid',
-                'items' => [
-                    ['service_id' => $services[0]->id, 'item_name' => $services[0]->name, 'quantity' => 1, 'unit_price' => 500.00, 'total_price' => 500.00],
-                ],
-            ],
-            [
-                'bill_number' => 'BILL-005',
-                'visit_id' => $visits[4]->id,
-                'patient_id' => $visits[4]->patient_id,
-                'total_amount' => 800.00,
-                'discount_amount' => 0.00,
-                'paid_amount' => 800.00,
-                'due_amount' => 0.00,
-                'status' => 'finalized',
-                'payment_status' => 'paid',
-                'items' => [
-                    ['service_id' => $services[1]->id, 'item_name' => $services[1]->name, 'quantity' => 1, 'unit_price' => 800.00, 'total_price' => 800.00],
-                ],
-            ],
-        ];
-
-        foreach ($bills as $billData) {
-            $items = $billData['items'];
-            unset($billData['items']);
-
-            $bill = Bill::create($billData);
-
-            foreach ($items as $itemData) {
-                $itemData['bill_id'] = $bill->id;
-                BillItem::create($itemData);
-            }
-        }
-
-        $this->command->info('5 bills with items seeded successfully!');
+        $this->command->info(count($visits) . ' bills with items seeded successfully!');
     }
 }

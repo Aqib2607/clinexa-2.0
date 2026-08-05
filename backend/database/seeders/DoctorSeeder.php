@@ -92,30 +92,34 @@ class DoctorSeeder extends Seeder
                 foreach ($doctorsByDept[$dept->name] as $index => $doctor) {
                     $email = strtolower(str_replace(['Dr. ', ' '], ['', '.'], $doctor['name'])) . '@hospital.com';
                     
-                    $user = User::create([
-                        'name' => $doctor['name'],
-                        'email' => $email,
-                        'password' => Hash::make('password123'),
-                        'phone' => '+91-' . rand(7000000000, 9999999999),
-                        'role' => 'doctor',
-                        'email_verified_at' => now(),
-                    ]);
+                    $user = User::firstOrCreate(
+                        ['email' => $email],
+                        [
+                            'name' => $doctor['name'],
+                            'password' => Hash::make('password123'),
+                            'phone' => '+91-' . rand(7000000000, 9999999999),
+                            'role' => 'doctor',
+                            'email_verified_at' => now(),
+                        ]
+                    );
 
                     $photoUrl = "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop&crop=faces&q=80&sig=" . ($dept->id * 10 + $index);
 
-                    DB::table('doctors')->insert([
-                        'user_id' => $user->id,
-                        'department_id' => $dept->id,
-                        'specialization' => $doctor['specialization'],
-                        'qualification' => $doctor['qualification'],
-                        'experience_years' => $doctor['experience'],
-                        'consultation_fee' => $doctor['fee'],
-                        'license_number' => 'MCI' . rand(100000, 999999),
-                        'photo_url' => $photoUrl,
-                        'is_active' => true,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
+                    DB::table('doctors')->updateOrInsert(
+                        ['user_id' => $user->id],
+                        [
+                            'department_id' => $dept->id,
+                            'specialization' => $doctor['specialization'],
+                            'qualification' => $doctor['qualification'],
+                            'experience_years' => $doctor['experience'],
+                            'consultation_fee' => $doctor['fee'],
+                            'license_number' => 'MCI' . rand(100000, 999999),
+                            'photo_url' => $photoUrl,
+                            'is_active' => true,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]
+                    );
                 }
             }
         }
