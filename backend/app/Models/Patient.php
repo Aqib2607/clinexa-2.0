@@ -12,6 +12,7 @@ class Patient extends Model
     // No HasUuids as table uses BigInt ID
 
     protected $fillable = [
+        'user_id',
         'uhid',
         'name',
         'dob',

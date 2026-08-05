@@ -55,6 +55,18 @@ class PatientPortalController extends Controller
         return response()->json($response);
     }
 
+    /**
+     * Helper to retrieve Patient record for an authenticated User via user_id, email, or phone.
+     */
+    private function getPatientForUser(\App\Models\User $user): ?Patient
+    {
+        return Patient::where('user_id', $user->id)
+            ->orWhere(function ($q) use ($user) {
+                if ($user->email) $q->where('email', $user->email);
+                if ($user->phone) $q->orWhere('phone', $user->phone);
+            })->first();
+    }
+
     public function verifyOtp(Request $request)
     {
         $request->validate([
@@ -98,6 +110,12 @@ class PatientPortalController extends Controller
             ]);
         }
 
+        // Link Patient record to User if not already linked
+        if (!$patient->user_id) {
+            $patient->user_id = $user->id;
+            $patient->save();
+        }
+
         $token = $user->createToken('patient-token')->plainTextToken;
 
         return response()->json([
@@ -112,7 +130,7 @@ class PatientPortalController extends Controller
         $user = $request->user();
         if (!$user) return response()->json(['error' => 'Unauthorized'], 401);
 
-        $patient = Patient::where('email', $user->email)->first();
+        $patient = $this->getPatientForUser($user);
         if (!$patient) return response()->json(['error' => 'Patient record not found.'], 404);
 
         // Fetch Reports (Lab & Radiology)
@@ -158,7 +176,7 @@ class PatientPortalController extends Controller
             [$resourceType, $resourceId] = explode('-', $token, 2);
             
             $user = $request->user();
-            $patient = Patient::where('email', $user->email)->first();
+            $patient = $this->getPatientForUser($user);
             
             if (!$patient) {
                 return response()->json(['error' => 'Patient record not found.'], 404);
@@ -216,7 +234,7 @@ class PatientPortalController extends Controller
         $user = $request->user();
         if (!$user) return response()->json(['error' => 'Unauthorized'], 401);
 
-        $patient = Patient::where('email', $user->email)->first();
+        $patient = $this->getPatientForUser($user);
 
         if (!$patient) {
             return response()->json(['error' => 'Patient record not found.'], 404);
@@ -304,7 +322,7 @@ class PatientPortalController extends Controller
     public function getAppointments(Request $request)
     {
         $user = $request->user();
-        $patient = Patient::where('email', $user->email)->first();
+        $patient = $this->getPatientForUser($user);
         if (!$patient) {
             return response()->json(['error' => 'Patient record not found.'], 404);
         }
@@ -342,7 +360,7 @@ class PatientPortalController extends Controller
     public function cancelAppointment(Request $request, $id)
     {
         $user = $request->user();
-        $patient = Patient::where('email', $user->email)->first();
+        $patient = $this->getPatientForUser($user);
         if (!$patient) {
             return response()->json(['error' => 'Patient record not found.'], 404);
         }
@@ -380,7 +398,7 @@ class PatientPortalController extends Controller
     public function getPrescriptions(Request $request)
     {
         $user = $request->user();
-        $patient = Patient::where('email', $user->email)->first();
+        $patient = $this->getPatientForUser($user);
         if (!$patient) {
             return response()->json(['error' => 'Patient record not found.'], 404);
         }
@@ -416,7 +434,7 @@ class PatientPortalController extends Controller
     public function getRecords(Request $request)
     {
         $user = $request->user();
-        $patient = Patient::where('email', $user->email)->first();
+        $patient = $this->getPatientForUser($user);
         if (!$patient) {
             return response()->json(['error' => 'Patient record not found.'], 404);
         }
@@ -472,7 +490,7 @@ class PatientPortalController extends Controller
     public function getProfile(Request $request)
     {
         $user = $request->user();
-        $patient = Patient::where('email', $user->email)->first();
+        $patient = $this->getPatientForUser($user);
         if (!$patient) {
             return response()->json(['error' => 'Patient record not found.'], 404);
         }
@@ -507,7 +525,7 @@ class PatientPortalController extends Controller
     public function updateProfile(Request $request)
     {
         $user = $request->user();
-        $patient = Patient::where('email', $user->email)->first();
+        $patient = $this->getPatientForUser($user);
         if (!$patient) {
             return response()->json(['error' => 'Patient record not found.'], 404);
         }

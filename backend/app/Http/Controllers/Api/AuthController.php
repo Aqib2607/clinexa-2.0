@@ -70,6 +70,7 @@ class AuthController extends Controller
             switch ($request->role) {
                 case 'patient':
                     Patient::create([
+                        'user_id' => $user->id,
                         'uhid' => 'P' . date('Ymd') . str_pad($user->id, 5, '0', STR_PAD_LEFT),
                         'name' => $user->name,
                         'email' => $user->email,
