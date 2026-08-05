@@ -1,10 +1,10 @@
 services:
+  # Backend API Web Service (Laravel 12 Docker)
   - type: web
     name: clinexa-backend
-    runtime: php
+    runtime: docker
     rootDir: backend
-    buildCommand: composer install --no-dev --optimize-autoloader && php artisan config:cache && php artisan route:cache
-    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
+    dockerfilePath: Dockerfile
     envVars:
       - key: APP_NAME
         value: Clinexa
@@ -16,14 +16,20 @@ services:
         value: stderr
       - key: DB_CONNECTION
         value: mysql
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
 
+  # Frontend Web App (React + Vite SPA)
   - type: web
     name: clinexa-frontend
     runtime: static
     rootDir: frontend
-    buildCommand: npm install && npm run build
+    buildCommand: "npm install && npm run build"
     staticPublishPath: dist
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
+
