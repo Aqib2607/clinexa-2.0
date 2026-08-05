@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFDE69;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFC700;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#111111"/>
+  
+  <!-- Left Medical Cross Icon -->
+  <g transform="translate(120 315)">
+    <rect x="-15" y="-50" width="30" height="100" rx="5" fill="url(#goldGradient)" opacity="0.3"/>
+    <rect x="-50" y="-15" width="100" height="30" rx="5" fill="url(#goldGradient)" opacity="0.3"/>
+  </g>
+  
+  <!-- Right Medical Icons -->
+  <g transform="translate(1050 315)">
+    <!-- Heartbeat line -->
+    <path d="M -60 0 L -40 0 L -30 -20 L -20 20 L -10 0 L 10 0" stroke="url(#goldGradient)" stroke-width="3" fill="none" opacity="0.4"/>
+    <!-- Stethoscope circle -->
+    <circle cx="30" cy="0" r="20" stroke="url(#goldGradient)" stroke-width="3" fill="none" opacity="0.4"/>
+  </g>
+  
+  <!-- Title -->
+  <text x="600" y="280" font-family="Playfair Display, serif" font-size="80" font-weight="800" fill="url(#goldGradient)" text-anchor="middle" letter-spacing="0.05em">
+    CLINEXA
+  </text>
+  
+  <!-- Tagline -->
+  <text x="600" y="360" font-family="Montserrat, sans-serif" font-size="28" font-weight="400" fill="#FFFFFF" text-anchor="middle" letter-spacing="0.08em">
+    MODERN HOSPITAL MANAGEMENT SYSTEM
+  </text>
+  
+  <!-- Decorative lines -->
+  <line x1="400" y1="390" x2="500" y2="390" stroke="url(#goldGradient)" stroke-width="2" opacity="0.5"/>
+  <line x1="700" y1="390" x2="800" y2="390" stroke="url(#goldGradient)" stroke-width="2" opacity="0.5"/>
+</svg>
