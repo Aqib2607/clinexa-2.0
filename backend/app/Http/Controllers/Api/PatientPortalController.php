@@ -169,7 +169,7 @@ class PatientPortalController extends Controller
     /**
      * Download secure link for lab/radiology results
      */
-    public function downloadSecure(Request $request, $token)
+    public function downloadSecure(Request $request, string $token)
     {
         // Check if token is a resource identifier (e.g., lab_result-xxx or radiology_result-xxx)
         if (str_contains($token, '-')) {
@@ -357,7 +357,7 @@ class PatientPortalController extends Controller
     /**
      * Cancel a patient's appointment
      */
-    public function cancelAppointment(Request $request, $id)
+    public function cancelAppointment(Request $request, string $id)
     {
         $user = $request->user();
         $patient = $this->getPatientForUser($user);
