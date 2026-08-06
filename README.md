@@ -4,6 +4,7 @@
   <img src="https://komarev.com/ghpvc/?username=Aqib2607&label=Project%20Views&color=0e75b6&style=flat-square" alt="Project Views" />
   <img src="https://img.shields.io/github/stars/Aqib2607/clinexa?style=flat-square&color=0e75b6" alt="Stars" />
   <img src="https://img.shields.io/github/forks/Aqib2607/clinexa?style=flat-square&color=0e75b6" alt="Forks" />
+  <img src="https://img.shields.io/badge/License-Proprietary-red?style=flat-square" alt="License" />
   <br>
   <a href="https://twitter.com/AqibJawwadNahin">
     <img src="https://img.shields.io/twitter/follow/:AqibJawwadNahin?style=flat-square" alt="Twitter Follow" />
@@ -143,9 +144,15 @@ I love building tools that make healthcare smarter! If you find this project use
 
 ### 🛡️ **License**
 
-Copyright (c) 2026 Aqib Jawwad. **All Rights Reserved.**
+Copyright (c) 2026 **Aqib Jawwad**. **All Rights Reserved.**
 
-This project is proprietary. Unauthorized copying, modification, distribution, or use of this software and its elements is strictly prohibited. For inquiries, contact [clinexabd@gmail.com](mailto:clinexabd@gmail.com).
+This project is strictly **proprietary and confidential**. All rights, title, and interest in and to this software—including but not limited to the source code, system architecture, database schemas, UI/UX designs, and documentation—are exclusively owned by **Aqib Jawwad**.
+
+- 🚫 **No Unauthorized Access or Use**: You do not have permission to copy, download, execute, or deploy this software.
+- 🚫 **No Redistribution or Modification**: Modifying, publishing, sublicensing, selling, renting, or distributing any portion of this repository is strictly prohibited.
+- 📜 Refer to the [LICENSE](LICENSE) file for complete terms, conditions, and legal restrictions.
+
+For licensing inquiries, permissions, or partnership opportunities, contact: **[clinexabd@gmail.com](mailto:clinexabd@gmail.com)**.
 
 ---
 
